@@ -6,7 +6,9 @@ class Elemento
 
     private $_elemEsquerda = NULL;
 
-    private $_elemDireita = NULL;
+    public $_elemDireita = NULL;
+
+    private $_pai = NULL;
 
     public function __construct($pIdentificador)
     {
@@ -16,6 +18,11 @@ class Elemento
     public function GetIdentificador()
     {
         return (int) $this->_identificador;
+    }
+
+    public function SetIdentificador($pIdentificador)
+    {
+        $this->_identificador = (int) $pIdentificador;
     }
 
     public function GetElemEsquerda()
@@ -49,6 +56,11 @@ class Elemento
         return false;
     }
 
+    public function TemApenasUmFilho()
+    {
+        return ($this->TemFilhoDireita() xor $this->TemFilhoEsquerda());
+    }
+
     public function TemFilhoEsquerda()
     {
         if($this->GetElemEsquerda())
@@ -63,6 +75,45 @@ class Elemento
             return true;
 
         return false;
+    }
+
+    public function TemPai()
+    {
+        return $this->_pai != NULL;
+    }
+
+    public function SetPai($pPai)
+    {
+        $this->_pai = $pPai;
+    }
+
+    public function GetPai()
+    {
+        return $this->_pai;
+    }
+
+    public function FilhoDaEsquerda()
+    {
+        if( !empty($this->GetPai()->GetElemEsquerda()) && ($this->GetPai()->GetElemEsquerda()->GetIdentificador() == $this->GetIdentificador()) )
+        {
+            return TRUE;
+        }
+        else
+        {
+            return FALSE;
+        }
+    }
+
+    public function FilhoDaDireita()
+    {
+        if( !empty($this->GetPai()->GetElemDireita()) && ($this->GetPai()->GetElemDireita()->GetIdentificador() == $this->GetIdentificador()) )
+        {
+            return TRUE;
+        }
+        else
+        {
+            return FALSE;
+        }
     }
 
     public function __invoke($pIdentificador)

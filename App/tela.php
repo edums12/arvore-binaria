@@ -19,6 +19,7 @@
                 </div>
                 <nav class="right nav">
                     <ul>
+                        <li><a id="btn-remover" href="#" class="btn modal-trigger" data-modal="modal-remove">Remover <span class="key">Shift + D</span></a></li>
                         <li><a id="btn-existe" href="#" class="btn modal-trigger" data-modal="modal-existe">Existe <span class="key">Shift + F</span></a></li>
                         <li><a id="btn-limpar" href="?action=limpar" class="btn">Limpar <span class="key">Shift + L</span></a></li>
                         <li><a id="btn-reordenar" href="?action=reorder" class="btn">Reordenar <span class="key">Shift + R</span></a></li>
@@ -86,6 +87,24 @@
         </form>
     </div>
 
+
+    <div class="modal" id="modal-remove" focused="#elemento-remove">
+        <div class="modal-header">
+            <h4>Remover nó</h4>
+        </div>
+        <form action="?action=remover" method="POST">
+            <div class="modal-content">
+                <div class="input-form">
+                    <label for="elemento-remove">Elemento: </label>
+                    <input type="number" name="elemento" id="elemento-remove" placeholder="Elemento" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" value="Remover" class="btn btn-green">
+            </div>
+        </form>
+    </div>
+
     <div class="modal" id="modal-existe" focused="#elemento-existe">
         <div class="modal-header">
             <h4>Existe nó?</h4>
@@ -93,7 +112,7 @@
         <form action="?action=existe" method="POST">
             <div class="modal-content">
                 <div class="input-form">
-                    <label for="elemento">Elemento: </label>
+                    <label for="elemento-existe">Elemento: </label>
                     <input type="number" name="elemento" id="elemento-existe" placeholder="Novo Elemento" required>
                 </div>
             </div>

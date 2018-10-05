@@ -24,7 +24,7 @@ class App
     public function index()
     {
         $arvore_binaria = new StdClass();
-
+        
         $arvore_binaria->tabela = 
             array(
                 "Raiz:"         => (!empty($this->arvore->GetRaiz()) ? $this->arvore->GetRaiz()->GetIdentificador() : ""),
@@ -32,8 +32,8 @@ class App
                 "Em Ordem:"     => $this->arvore->Listar('emOrdem'),
                 "Pré Ordem:"    => $this->arvore->Listar('preOrdem'),
                 "Pós Ordem:"    => $this->arvore->Listar('posOrdem'),
-                "Menor Valor:"  => $this->arvore->GetMenor(),
-                "Maior Valor:"  => $this->arvore->GetMaior()
+                "Menor Valor:"  => (!empty($this->arvore->GetMenor()) ? $this->arvore->GetMenor()->GetIdentificador() : ""),
+                "Maior Valor:"  => (!empty($this->arvore->GetMaior()) ? $this->arvore->GetMaior()->GetIdentificador() : "")
             );
 
         $arvore_binaria->resumo = $this->arvore->GetResumo();
@@ -56,7 +56,21 @@ class App
 
         $this->db->truncate('arvore');
 
-        $this->db->insert('arvore', $arvore->nos());
+        $this->db->insert('arvore', $arvore->Nos());
+
+        redirect();
+    }
+
+    public function Remover( $elemento )
+    {
+        $arvore = $this->arvore->Remover(trim($elemento));
+
+        if($arvore)
+        {
+            $this->db->truncate('arvore');
+    
+            $this->db->insert('arvore', $arvore->Nos('preOrdem'));
+        }
 
         redirect();
     }
@@ -88,6 +102,9 @@ class App
         {
             case 'add':
                 $this->Add( $_POST['elemento'] );
+                break;
+            case 'remover':
+                $this->Remover( $_POST['elemento'] );
                 break;
             case 'reorder':
                 $this->Reorder();

@@ -218,31 +218,24 @@ class Arvore
             return $ordens['posOrdem'];
     }
 
-    public function GetMenor(){
-        $emOrdem = $this->Listar('emOrdem');
-
-        if( !is_null($emOrdem) )
-        {
-            return explode(SEPARADOR_LISTA, $emOrdem)[0]; 
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     public function GetMaior()
     {
-        $emOrdem = $this->Listar('emOrdem');
+        if( $this->Vazia() )
+        {
+            return NULL;
+        }
 
-        if( !is_null($emOrdem) )
+        return $this->getMaiorIn($this->GetRaiz());
+    }
+
+    public function GetMenor()
+    {
+        if( $this->Vazia() )
         {
-            return explode(SEPARADOR_LISTA, $emOrdem)[$this->Count() - 1]; 
+            return NULL;
         }
-        else
-        {
-            return null;
-        }
+
+        return $this->getMenorIn($this->GetRaiz());
     }
 
     public function Reordenar()
@@ -292,15 +285,85 @@ class Arvore
         }
     }
 
-    public function nos()
+    public function Nos($ordem = 'emOrdem')
     {
-        return explode(SEPARADOR_LISTA, $this->Listar('emOrdem'));
+        return explode(SEPARADOR_LISTA, $this->Listar($ordem));
     }
 
+    public function Remover($elem)
+    {
+        if( !is_a($elem, 'Elemento') )
+        {
+            $elem = new Elemento($elem);
+        }
+
+        if( !$this->Existe($elem) )
+        {
+            new Alert('warning', "{$elem->GetIdentificador()} não existe!");
+            
+            return FALSE;
+        }
+
+        $this->removeIn($this->GetRaiz(), $elem);
+
+        $this->decrement();
+
+        new Alert('success', "{$elem->GetIdentificador()} foi removido!");
+
+        return $this;
+    }
+
+    public function SubArvore($raiz)
+    {
+        if( empty($raiz) || empty($raiz->GetIdentificador()) )
+        {
+            return FALSE;
+        }
+        
+        $Arvore = new Arvore();
+
+        $preOrdem = $this->preOrdem($raiz);
+
+        foreach ($preOrdem as $i => $elemento) {
+            $Arvore($elemento);
+        }
+
+        if($raiz->TemPai())
+        {
+            $Arvore->GetRaiz()->SetPai($raiz->GetPai());
+        }
+
+        return $Arvore;
+    }
 
     /**
      * Funções privadas...
      */
+
+    private function getMaiorIn($raiz)
+    {
+        if( $raiz->TemFilhoDireita() )
+        {
+            return $this->getMaiorIn($raiz->GetElemDireita());
+        }
+        else
+        {
+            return $raiz;
+        }
+    }
+
+    private function getMenorIn($raiz)
+    {
+        if( $raiz->TemFilhoEsquerda() )
+        {
+            return $this->getMenorIn($raiz->GetElemEsquerda() );
+        }
+        else
+        {
+            return $raiz;
+        }
+    }
+
     private function existeIn($raiz, $elem)
     {
         if($raiz->GetIdentificador() === $elem->GetIdentificador())
@@ -350,6 +413,8 @@ class Arvore
 
                 $this->_resumo[] = "{$elem->GetIdentificador()} adicionado à esquerda de {$raiz->GetIdentificador()}";
 
+                $elem->SetPai($raiz);
+
                 $this->increment();
             }
         }
@@ -364,6 +429,8 @@ class Arvore
                 $raiz->SetElemDireita($elem);
 
                 $this->_resumo[] = "{$elem->GetIdentificador()} adicionado à direita de {$raiz->GetIdentificador()}";
+
+                $elem->SetPai($raiz);
 
                 $this->increment();
             }
@@ -382,6 +449,11 @@ class Arvore
     private function increment()
     {
         $this->_numNodos++;
+    }
+
+    private function decrement()
+    {
+        $this->_numNodos--;
     }
 
     private function emOrdem($raiz) //ERD
@@ -427,6 +499,127 @@ class Arvore
             $list = array_merge($list, $this->preOrdem($raiz->GetElemDireita()));
 
         return $list;    
+    }
+
+    private function removeIn($raiz, $elem)
+    {
+        if( $elem->GetIdentificador() == $raiz->GetIdentificador() )
+        {
+            if( $raiz->TemFilho() )
+            {
+                if( $raiz->TemApenasUmFilho() )
+                {
+                    if( $raiz->TemFilhoEsquerda() )
+                    {
+                        if( $raiz->TemPai() )
+                        {
+                            if( $raiz->FilhoDaEsquerda() )
+                            {
+                                $raiz->GetPai()->SetElemEsquerda($raiz->GetElemEsquerda());
+
+                                $raiz->GetElemEsquerda()->SetPai($raiz->GetPai());
+                            }
+                            else
+                            {
+                                $raiz->GetPai()->SetElemDireita($raiz->GetElemDireita());
+                                
+                                $raiz->GetElemDireita()->SetPai($raiz->GetPai());
+                            }
+                        }
+                        else
+                        {
+                            $this->_raiz = $raiz->GetElemEsquerda();
+                        }
+                    }
+                    else
+                    {
+                        if( $raiz->TemPai() )
+                        {
+                            if( $raiz->FilhoDaEsquerda() )
+                            {
+                                $raiz->GetPai()->SetElemEsquerda($raiz->GetElemDireita());
+
+                                $raiz->GetElemDireita()->SetPai($raiz->GetPai());
+                            }
+                            else
+                            {
+                                $raiz->GetPai()->SetElemDireita($raiz->GetElemDireita());
+                                
+                                $raiz->GetElemDireita()->SetPai($raiz->GetPai());
+                            }
+                        }
+                        else
+                        {
+                            $this->_raiz = $raiz->GetElemEsquerda();
+                        }
+                    }
+                }
+                else
+                {
+                    if( $raiz->TemPai() )
+                    {
+                        $novaRaiz = $this->SubArvore($raiz)->GetMaior();
+                        
+                        $raiz->SetIdentificador($novaRaiz->GetIdentificador());
+
+                        $novaRaiz->GetPai()->SetElemDireita(NULL);
+                        // $this->SubArvore($raiz)->GetMaior()->GetPai()->$_elemDireita = "eduardo";
+
+                    }
+                    else
+                    {
+                        $this->_raiz->SetIdentificador($this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetIdentificador());                        
+
+                        if($this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetPai() == $this->GetRaiz())
+                        {
+                            $this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetPai()->SetElemEsquerda(NULL);
+                        }
+                        else
+                        {
+                            $this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetPai()->SetElemDireita(NULL);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if( $raiz->TemPai() )
+                {
+                    if( $raiz->FilhoDaEsquerda() )
+                    {
+                        $raiz->GetPai()->SetElemEsquerda(NULL);
+                    }
+                    else
+                    {
+                        $raiz->GetPai()->SetElemDireita(NULL);
+                    }
+                }
+                else
+                {
+                    $this->clear();
+                }
+            }
+        }
+        else
+        {
+            if( $elem->GetIdentificador() <= $raiz->GetIdentificador() )
+            {
+                return $this->removeIn($raiz->GetElemEsquerda(), $elem);
+            }
+            else
+            {
+                return $this->removeIn($raiz->GetElemDireita(), $elem);
+            }
+        }
+    }
+
+    private function clear()
+    {
+        $this->_raiz = NULL;
+
+        $this->_numNodos = 0;
+
+        $this->_resumo = array();
     }
 
     /**

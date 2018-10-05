@@ -52,6 +52,10 @@ window.addEventListener('keypress', (e) => {
         document.getElementById('btn-existe').click()
     }
 
+    if (e.keyCode == 68) { // SHIFT + D
+        document.getElementById('btn-remover').click()
+    }
+
     // alert(e.keyCode);
 
 })

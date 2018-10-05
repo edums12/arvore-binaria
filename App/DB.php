@@ -103,12 +103,18 @@ class DB
         if(is_array($content))
         {
             foreach ($content as $value) {
-                $this->_write($value);
+                if(!is_null($value) && !empty($value))
+                {
+                    $this->_write($value);
+                }
             }
         }
         else
         {
-            $this->_write($content);
+            if(!is_null($content) && !empty($content))
+            {
+                $this->_write($content);
+            }
         }
 
 
