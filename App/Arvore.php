@@ -25,7 +25,7 @@
  * @author Eduardo <marqueseduardo72130@gmail.com>
  *  */
 
-    const AB_VERSAO = '1.0.0';
+    const AB_VERSAO = '1.0.1';
 
     const SEPARADOR_LISTA = ' > ';
 
@@ -262,7 +262,7 @@ class Arvore
             $Arvore->Add($Raiz);
 
             foreach ($emOrdem as $posicao => $elemento) {
-                if( $posicao != ($PosCentral - 1) )
+                if( $posicao != ($PosCentral) )
                 {
                     $Arvore->Add($elemento);
                 }
@@ -563,14 +563,12 @@ class Arvore
                         $raiz->SetIdentificador($novaRaiz->GetIdentificador());
 
                         $novaRaiz->GetPai()->SetElemDireita(NULL);
-                        // $this->SubArvore($raiz)->GetMaior()->GetPai()->$_elemDireita = "eduardo";
-
                     }
                     else
                     {
-                        $this->_raiz->SetIdentificador($this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetIdentificador());                        
-
-                        if($this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetPai() == $this->GetRaiz())
+                        $identificador = $this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetIdentificador();          
+ 
+                        if($this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetPai()->GetIdentificador() == $this->GetRaiz()->GetIdentificador())
                         {
                             $this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetPai()->SetElemEsquerda(NULL);
                         }
@@ -578,6 +576,8 @@ class Arvore
                         {
                             $this->SubArvore($raiz->GetElemEsquerda())->GetMaior()->GetPai()->SetElemDireita(NULL);
                         }
+
+                        $this->_raiz->SetIdentificador($identificador);
                     }
                 }
             }
